@@ -55,6 +55,12 @@ android {
 dependencies {
 
 
+
+    implementation(libs.androidx.room.runtime)
+    kapt(libs.androidx.room.compiler)
+    implementation(libs.androidx.room.ktx)
+    kapt(libs.room.compiler)
+    // To use Kotlin Symbol Processing (KSP)
     implementation(libs.androidx.paging.compose)
     implementation(libs.androidx.paging.runtime.ktx)
     implementation(libs.hilt.android)

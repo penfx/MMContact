@@ -1,4 +1,4 @@
-package com.mm.contact.data.entities
+package com.mm.contact.data
 
 sealed class Result<out T> {
 

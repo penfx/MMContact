@@ -1,8 +1,7 @@
 package com.mm.contact.di
 
+import android.app.Application
 import com.mm.contact.data.local.MMDatabase
-import com.mm.contact.data.repository.ContactsRepositoryImp
-import com.mm.contact.domain.repository.ContactsRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -11,9 +10,11 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-class RepositoryModule {
+class DatabaseModule {
 
     @Singleton
     @Provides
-    fun provideRepository(contactDb: MMDatabase,): ContactsRepository = ContactsRepositoryImp(contactDb)
+    fun provideDatabase(application: Application): MMDatabase {
+        return MMDatabase.getDatabase(application)
+    }
 }

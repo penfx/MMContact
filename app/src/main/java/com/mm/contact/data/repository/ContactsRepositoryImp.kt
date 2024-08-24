@@ -1,37 +1,35 @@
 package com.mm.contact.data.repository
 
-import com.mm.contact.data.entities.Result
-import com.mm.contact.data.provider.ContactProvider
+import com.mm.contact.data.Result
+import com.mm.contact.data.local.MMDatabase
+import com.mm.contact.data.local.entities.ContactEntity
 import com.mm.contact.data.toModel
 import com.mm.contact.domain.model.Contact
 import com.mm.contact.domain.repository.ContactsRepository
 import com.mm.contact.helpers.IoDispatcher
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class ContactsRepositoryImp(
-    private val contactProvider: ContactProvider,
+    private val contactDb: MMDatabase,
 
-) : ContactsRepository {
+    ) : ContactsRepository {
     @Inject
     @IoDispatcher
-    lateinit var  coroutineDispatcher: CoroutineDispatcher
+    lateinit var coroutineDispatcher: CoroutineDispatcher
 
     override suspend fun getAllContact(
         page: Int,
         pageSize: Int,
         searchQuery: String?
-    ): Result<List<Contact>> {
+    ): Flow<List<Contact>> = contactDb.getContactDao()
+        .getContacts()
+        .map { it.map { c -> c.toModel() } }
 
-        with(coroutineDispatcher) {
-            return when (val result = contactProvider.getContacts(page, pageSize, searchQuery)) {
-                is Result.Success -> {
-                    Result.Success(result.data.map { it.toModel() })
-                }
-                is Result.Error -> Result.Error(result.exception)
-                Result.Loading -> Result.Loading
-            }
-        }
+    override suspend fun insertContact(contact: ContactEntity) {
+        return contactDb.getContactDao().insertContact(contact)
     }
 
 }
