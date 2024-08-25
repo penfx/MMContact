@@ -24,7 +24,7 @@ fun SearchBox(focusManager: FocusManager, viewModel: MainViewModel) {
         singleLine = true,
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
         keyboardActions = KeyboardActions(onDone = {
-            viewModel.onEvent(ContactEvent.FetchContact())
+            viewModel.onEvent(ContactEvent.SearchContact())
             focusManager.clearFocus()
         }),
         onValueChange = {

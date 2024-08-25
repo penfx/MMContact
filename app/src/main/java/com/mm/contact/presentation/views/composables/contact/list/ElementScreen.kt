@@ -1,5 +1,6 @@
 package com.mm.contact.presentation.views.composables.contact.list
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -10,12 +11,17 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -30,6 +36,7 @@ import com.mm.contact.domain.model.Contact
 import com.mm.contact.presentation.common.ViewState
 import com.mm.contact.presentation.viewmodels.MainViewModel
 import com.mm.contact.presentation.views.composables.contact.ContactEvent
+import kotlinx.coroutines.withContext
 import kotlin.random.Random
 
 @Composable
@@ -55,7 +62,8 @@ fun ListContactScreen(
 
 @Composable
 fun ListContact(viewModel: MainViewModel, contacts: List<Contact>) {
-
+    val listState = rememberLazyListState()
+    val canScrollForward: Boolean by remember { derivedStateOf { listState.canScrollForward } }
     val rageColors = mutableListOf(
         Blue,
         Color.Green,
@@ -70,7 +78,9 @@ fun ListContact(viewModel: MainViewModel, contacts: List<Contact>) {
         Color.DarkGray,
         Color.Black
     )
-    LazyColumn() {
+
+
+    LazyColumn(state = listState) {
         items(contacts.size) { item ->
 
             Row(
@@ -104,6 +114,12 @@ fun ListContact(viewModel: MainViewModel, contacts: List<Contact>) {
                         text = contacts[item].phoneNumber ?: "",
                         style = MaterialTheme.typography.bodySmall
                     )
+                }
+            }
+            LaunchedEffect(canScrollForward) {
+                Log.e("WTF", "canScrollForward :$canScrollForward")
+                if (!canScrollForward) {
+                    viewModel.onEvent(ContactEvent.LoadMoreContact())
                 }
             }
         }

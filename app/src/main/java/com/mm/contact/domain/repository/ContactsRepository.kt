@@ -5,9 +5,9 @@ import com.mm.contact.domain.model.Contact
 import kotlinx.coroutines.flow.Flow
 
 interface ContactsRepository {
-    fun getAllContact():Flow<List<Contact>>
-    suspend fun getAllContact(
-        page: Int, pageSize: Int
+    fun getAllContacts():Flow<List<Contact>>
+    suspend fun getContacts(
+        page: Int
     ): Flow<List<Contact>>
 
     suspend fun insertContact(toEntity: ContactEntity)

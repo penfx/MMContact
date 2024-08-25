@@ -9,8 +9,11 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface ContactDao {
-    @Query("SELECT * FROM ContactEntity ")
+    @Query("SELECT * FROM ContactEntity ORDER BY name  ")
     fun getContacts(): Flow<List<ContactEntity>>
+
+    @Query("SELECT * FROM ContactEntity ORDER BY name LIMIT :limit offset :offset ")
+    fun getContacts(offset: Int, limit: Int = 10): Flow<List<ContactEntity>>
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     fun insertContact(contactEntity: ContactEntity)

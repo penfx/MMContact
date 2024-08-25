@@ -7,4 +7,6 @@ sealed class ContactEvent {
     class TypeSearch(val input: String) : ContactEvent()
     class CreateContact(val contact: Contact) : ContactEvent()
     class FetchContact():ContactEvent()
+    class SearchContact():ContactEvent()
+    class LoadMoreContact():ContactEvent()
 }
