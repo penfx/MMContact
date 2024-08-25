@@ -5,5 +5,6 @@ import kotlinx.coroutines.flow.Flow
 
 interface ContactUseCase {
     suspend fun getAllContact(pageSize: Int, page: Int, searchQuery: String?): Flow<List<Contact>>
+    fun getAllContact(): Flow<List<Contact>>
     suspend fun createContact(contact: Contact)
 }
