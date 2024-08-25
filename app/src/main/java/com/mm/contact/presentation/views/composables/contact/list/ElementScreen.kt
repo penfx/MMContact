@@ -52,7 +52,6 @@ fun ListContactScreen(
         is ViewState.Success<*> -> {
             ListContact(
                 viewModel,
-                isLoadingMore = (state.value as ViewState.Success<*>).loadingMore,
                 (state.value as ViewState.Success<*>).value as List<Contact>
             )
         }
@@ -60,30 +59,19 @@ fun ListContactScreen(
 }
 
 @Composable
-fun ListContact(viewModel: MainViewModel,isLoadingMore:Boolean, contacts: List<Contact>) {
+fun ListContact(viewModel: MainViewModel, contacts: List<Contact>) {
     val listState = rememberLazyListState()
 
     val isScrollToEnd by remember {
         derivedStateOf {
-            listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index == listState.layoutInfo.totalItemsCount - 1
+            listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index == listState.layoutInfo.totalItemsCount - 3
         }
     }
-    val rageColors = mutableListOf(
-        Blue,
-        Color.Green,
-        LightGray,
-        Color.Red,
-        Color.Green,
-        Yellow,
-        Color.Cyan,
-        Color.Magenta,
-        Color.Gray,
-        Color.LightGray,
-        Color.DarkGray,
-        Color.Black
-    )
-    if (isScrollToEnd && !isLoadingMore) {
-        viewModel.onEvent(ContactEvent.LoadMoreContact())
+
+    LaunchedEffect(isScrollToEnd) {
+        if (!isScrollToEnd) {
+            viewModel.onEvent(ContactEvent.LoadMoreContact())
+        }
     }
     LazyColumn(state = listState) {
         items(contacts.size) { item ->
@@ -96,9 +84,9 @@ fun ListContact(viewModel: MainViewModel,isLoadingMore:Boolean, contacts: List<C
             ) {
                 Box(
                     modifier = Modifier
-                        .size(40.dp)
+                        .size(80.dp)
                         .clip(CircleShape)
-                        .background(rageColors[Random.nextInt(rageColors.size)]),
+                        .background(Color.LightGray),
                     contentAlignment = Alignment.Center
                 ) {
                     Text(

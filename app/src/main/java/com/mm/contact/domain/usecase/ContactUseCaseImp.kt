@@ -31,7 +31,7 @@ class ContactUseCaseImp(private val contactsRepository: ContactsRepository) : Co
         } else {
             return flowOf(contacts.filter { contact ->
                 val score = FuzzySearch.ratio(contact.name.lowercase(), query.lowercase())
-                return@filter (score > 60)
+                return@filter (score > 30)
             })
         }
     }

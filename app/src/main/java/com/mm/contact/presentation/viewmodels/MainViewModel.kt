@@ -1,6 +1,5 @@
 package com.mm.contact.presentation.viewmodels
 
-import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
@@ -12,7 +11,6 @@ import com.mm.contact.presentation.views.composables.contact.ContactEvent
 import com.mm.contact.presentation.views.composables.contact.create.CreateContactState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -58,7 +56,7 @@ class MainViewModel @Inject constructor(
                 viewModelScope.launch {
                     contactUseCase.getContacts(0).collect {
                         nextPage = 0
-                        viewStateMutable.value = ViewState.Success(it,false)
+                        viewStateMutable.value = ViewState.Success(it)
                         contacts = it.toMutableList()
                         //Get for caching search
                         contactUseCase.getAllContact().collect {}
@@ -74,7 +72,7 @@ class MainViewModel @Inject constructor(
                     }
                     contactUseCase.searchContacts(query = query).collect {
                         contacts = it.toMutableList()
-                        viewStateMutable.value = ViewState.Success(it, false)
+                        viewStateMutable.value = ViewState.Success(it)
                     }
                 }
 
@@ -82,15 +80,17 @@ class MainViewModel @Inject constructor(
 
             is ContactEvent.LoadMoreContact -> {
                 if (isSearching) return
-                if ((viewState.value as ViewState.Success<*>).loadingMore) return
 
                 viewModelScope.launch {
-                    delay(300)
-                    viewStateMutable.value = ViewState.Success(contacts,true)
-                    nextPage += 1
-                    contactUseCase.getContacts(nextPage).collect {
-                        contacts.addAll(it)
-                        viewStateMutable.value = ViewState.Success(contacts,false)
+                    contactUseCase.getContacts(nextPage + 1).collect {
+                        if (it.isNotEmpty()) {
+                            nextPage += 1
+                            val list = ArrayList<Contact>()
+                            list.addAll(contacts)
+                            list.addAll(it)
+                            viewStateMutable.value = ViewState.Success(list)
+                            contacts = list
+                        }
                     }
                 }
 
