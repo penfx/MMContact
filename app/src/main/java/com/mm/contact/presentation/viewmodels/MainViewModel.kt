@@ -25,7 +25,6 @@ class MainViewModel @Inject constructor(
     private var contacts = mutableListOf<Contact>()
     private var nextPage = 0;
     private var isSearching = false;
-    private var isLoadingMoreContact = false;
     private val viewStateMutable: MutableStateFlow<ViewState<*>> =
         MutableStateFlow(ViewState.Loading)
     val viewState = viewStateMutable.asStateFlow()
@@ -59,7 +58,7 @@ class MainViewModel @Inject constructor(
                 viewModelScope.launch {
                     contactUseCase.getContacts(0).collect {
                         nextPage = 0
-                        viewStateMutable.value = ViewState.Success(it)
+                        viewStateMutable.value = ViewState.Success(it,false)
                         contacts = it.toMutableList()
                         //Get for caching search
                         contactUseCase.getAllContact().collect {}
@@ -75,7 +74,7 @@ class MainViewModel @Inject constructor(
                     }
                     contactUseCase.searchContacts(query = query).collect {
                         contacts = it.toMutableList()
-                        viewStateMutable.value = ViewState.Success(it)
+                        viewStateMutable.value = ViewState.Success(it, false)
                     }
                 }
 
@@ -83,18 +82,15 @@ class MainViewModel @Inject constructor(
 
             is ContactEvent.LoadMoreContact -> {
                 if (isSearching) return
-                if (isLoadingMoreContact) return
-
-                isLoadingMoreContact = true
+                if ((viewState.value as ViewState.Success<*>).loadingMore) return
 
                 viewModelScope.launch {
-                    delay(200)
+                    delay(300)
+                    viewStateMutable.value = ViewState.Success(contacts,true)
                     nextPage += 1
                     contactUseCase.getContacts(nextPage).collect {
-                        isLoadingMoreContact = true // Re-enable the button after the delay
                         contacts.addAll(it)
-                        viewStateMutable.value = ViewState.Success(contacts)
-                        isLoadingMoreContact = false
+                        viewStateMutable.value = ViewState.Success(contacts,false)
                     }
                 }
 

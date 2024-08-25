@@ -1,6 +1,7 @@
 package com.mm.contact.domain.usecase
 
 
+import android.util.Log
 import com.mm.contact.data.toEntity
 import com.mm.contact.domain.model.Contact
 import com.mm.contact.domain.repository.ContactsRepository
